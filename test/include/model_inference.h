@@ -13,6 +13,7 @@ public:
     bool loadModel(const std::string& modelPath);
     std::vector<float> runInference(const std::vector<float>& inputData);
     void releaseResources();
+    torch::Tensor preprocess_input(const std::vector<float>& input_data);
 
 private:
     torch::jit::script::Module model;
