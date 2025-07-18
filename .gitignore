@@ -1,0 +1,77 @@
+test/libtorch
+
+
+# C++ build artifacts
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.out
+*.a
+*.lib
+*.dSYM/
+*.app/
+*.bin
+
+# CUDA build artifacts
+*.cu.o
+*.ptx
+*.cubin
+*.fatbin
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg
+*.egg-info/
+dist/
+build/
+*.manifest
+*.spec
+
+# PyTorch
+*.pth
+*.pt
+*.onnx
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+build/
+*.cmake
+
+# Docker
+*.log
+docker-compose.override.yml
+.env
+.env.*
+
+# VS Code
+.vscode/
+
+# General
+*.swp
+*.swo
+*.bak
+*.tmp
+*.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Test/coverage reports
+htmlcov/
+.coverage
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+*.pyc
+
+#
