@@ -21,3 +21,5 @@ with h5py.File('data.h5', 'r') as hf:
 
 print("X shape: ", X.shape)
 print("y shape: ", y.shape)
+print("X sample: ", X[0])
+print("y sample: ", y[0])

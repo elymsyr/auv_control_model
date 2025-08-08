@@ -9,6 +9,10 @@ int main(int argc, char* argv[]) {
     std::string modelPath = "../fossen_net_scripted.pt";
     std::string inputDataPath = "../input.txt";
 
+    if (torch::cuda::is_available()) {
+        torch::globalContext().setBenchmarkCuDNN(true);
+    }
+
     // Parse command-line arguments
     if (argc == 2) {
         // Only model path provided
@@ -37,6 +41,7 @@ int main(int argc, char* argv[]) {
             std::cerr << "Failed to load model: " << modelPath << std::endl;
             return 1;
         }
+        
 
         // Load input data
         std::vector<float> inputData;
@@ -69,6 +74,14 @@ int main(int argc, char* argv[]) {
 
         // Run inference
         try {
+            // Warm-up runs
+            if (torch::cuda::is_available()) {
+                std::cout << "Running warm-up iterations..." << std::endl;
+                for (int i = 0; i < 10; ++i) {
+                    model.runInference(normalizedInput);
+                }
+            }
+
             std::cout << "Running inference..." << std::endl;
             auto start = std::chrono::high_resolution_clock::now();
             
