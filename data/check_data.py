@@ -1,7 +1,7 @@
 import h5py
 import numpy as np
 
-with h5py.File('data.h5', 'r') as hf:
+with h5py.File('data_ins_0.h5', 'r') as hf:
     # Load datasets
     x_current = hf['x_current'][:]  # Shape: (num_samples, 12)
     x_ref = hf['x_ref'][:]          # Shape: (num_samples, 12*(N+1))
