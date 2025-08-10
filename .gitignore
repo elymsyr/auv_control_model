@@ -1,6 +1,4 @@
 test/libtorch
-*.pth
-*.pt
 *.h5
 
 # C++ build artifacts
@@ -37,7 +35,6 @@ build/
 
 # PyTorch
 *.pth
-*.pt
 *.onnx
 
 # CMake
