@@ -6,8 +6,9 @@
 
 int main(int argc, char* argv[]) {
     // Set default paths
-    std::string modelPath = "../fossen_net_scripted.pt";
+    std::string modelPath = "../../pretrained/fossen_net_0/fossen_net_scripted.pt";
     std::string inputDataPath = "../input.txt";
+    std::string scalerPath = "../../pretrained/fossen_net_0/scalers.json";
 
     if (torch::cuda::is_available()) {
         torch::globalContext().setBenchmarkCuDNN(true);
@@ -37,6 +38,10 @@ int main(int argc, char* argv[]) {
     try {
         ModelInference model;
         std::cout << "\nLoading model..." << std::endl;
+        if (!model.loadScalers(scalerPath)) {
+            std::cerr << "Failed to load scalers: " << scalerPath << std::endl;
+            return 1;
+        }
         if (!model.loadModel(modelPath)) {
             std::cerr << "Failed to load model: " << modelPath << std::endl;
             return 1;

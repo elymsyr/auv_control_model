@@ -1,4 +1,4 @@
-test/libtorch
+libtorch*
 *.h5
 
 # C++ build artifacts
