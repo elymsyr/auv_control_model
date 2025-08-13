@@ -1,5 +1,6 @@
 # AUV Control via Deep Imitation Learning
 
+See implemented Dynamic and Kinematic Models [here](https://github.com/elymsyr/auv_control_system/blob/main/docs/DYNAMICS_README.md)...
 This repository contains a complete pipeline for training a deep neural network to control an Autonomous Underwater Vehicle (AUV). The network learns to imitate the behavior of a computationally expensive nonlinear Model Predictive Controller (NL-MPC), enabling real-time, high-performance control.
 
 The project demonstrates a successful workflow from data generation and preprocessing to model training, optimization, and evaluation, culminating in a model with **97.6% R²** performance on a challenging, unseen test set.
