@@ -6,9 +6,9 @@
 
 int main(int argc, char* argv[]) {
     // Set default paths
-    std::string modelPath = "../../pretrained/fossen_net_0/fossen_net_scripted.pt";
+    std::string modelPath = "../../pretrained/fossen_net_1/fossen_net_scripted.pt";
     std::string inputDataPath = "../input.txt";
-    std::string scalerPath = "../../pretrained/fossen_net_0/scalers.json";
+    std::string scalerPath = "../../pretrained/fossen_net_1/scalers.json";
 
     if (torch::cuda::is_available()) {
         torch::globalContext().setBenchmarkCuDNN(true);

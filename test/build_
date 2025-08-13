@@ -1,9 +1,7 @@
 rm -rf build
 mkdir build
 cd build
-cmake -DCMAKE_PREFIX_PATH=/home/eren/GitHub/auv_control_model/test/libtorch \
-    -DUSE_CUDA=ON \
-    -DUSE_CUDNN=ON ..
+cmake -DCMAKE_PREFIX_PATH=/home/eren/GitHub/auv_control_model/test/libtorch ..
 make -j$(nproc)
 
 export LD_LIBRARY_PATH=/home/eren/GitHub/auv_control_model/test/libtorch/lib:$LD_LIBRARY_PATH
