@@ -19,11 +19,13 @@ This project underwent a systematic optimization process that dramatically impro
     3.  **Robust Loss Function:** Switched from `MSELoss` to `HuberLoss` to make training less sensitive to outlier thruster commands.
 *   **Final Result:** The optimized model achieves an overall **R² of 0.9762**, with even the weakest thrusters now performing excellently (e.g., Thruster 3 R² improved from 0.25 to **0.94**).
 
-| Metric | Original Model | **Optimized Model** |
-| :--- | :--- | :--- |
-| **R² (Overall)** | 0.7735 | **0.9762** |
-| Thruster 3 R² | 0.2516 | **0.9428** |
-| Thruster 4 R² | 0.5913 | **0.9528** |
+| Metric | fossen_net | **fossen_net_0** | **fossen_net_1** |
+| :--- | :--- | :--- | :--- |
+| **R² (Overall)** | 0.7735 | **0.9762** | **0.9908** |
+| Thruster 3 R² | 0.2516 | **0.9428** | **0.9781** |
+| Thruster 4 R² | 0.5913 | **0.9528** | **0.9839** |
+| Training Platform | Local | Local | **Amazon Sagemaker** |
+| Data Size | ~20m | ~180m | **~420m** |
 
 ## Repository Structure
 
