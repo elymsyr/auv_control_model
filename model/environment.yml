@@ -1,4 +1,4 @@
-name: control_model
+name: mp_test
 channels:
   - conda-forge
   - defaults

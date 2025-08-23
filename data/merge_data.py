@@ -90,7 +90,7 @@ if __name__ == '__main__':
     # Use glob to find all files starting with 'data_ins_' and ending with '.h5'
     # inside the directory where the script is located.
     # This makes the paths absolute and prevents location-based errors.
-    search_path = os.path.join(script_parent_dir, 'data_ins_*.h5')
+    search_path = os.path.join(script_parent_dir, 'data*.h5')
     h5_files = glob.glob(search_path)
     h5_files.sort() # Sort the files to ensure a consistent merge order
 
