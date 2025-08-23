@@ -15,17 +15,28 @@ This project underwent a systematic optimization process that dramatically impro
 *   **Initial Problem:** The baseline model achieved a respectable 77.3% R² score but failed to learn the dynamics of specific thrusters, with R² scores as low as **0.25** for Thruster 3.
 *   **Core Improvements:**
     1.  **Corrected Data Handling:** Implemented strict scenario-based splitting to eliminate data leakage between training and test sets, ensuring honest performance metrics.
-    2.  **Increased Model Capacity:** Enhanced the network architecture to better capture complex, non-linear dynamics.
-    3.  **Robust Loss Function:** Switched from `MSELoss` to `HuberLoss` to make training less sensitive to outlier thruster commands.
+    2.  **Intelligent Feature Engineering:** Reduced the reference trajectory input from 492 features to just 16. Instead of the full path, the model now receives 4 key future waypoints (`[x, y, z, yaw]`), making the input more concise and focused. This dramatically improved learning efficiency.
+    3.  **Increased Model Capacity:** Enhanced the network architecture to better capture complex, non-linear dynamics.
+    4.  **Robust Loss Function:** Switched from `MSELoss` to `HuberLoss` to make training less sensitive to outlier thruster commands.
 *   **Final Result:** The optimized model achieves an overall **R² of 0.9762**, with even the weakest thrusters now performing excellently (e.g., Thruster 3 R² improved from 0.25 to **0.94**).
 
-| Metric | fossen_net | **fossen_net_0** | **fossen_net_1** |
+| Metric | fossen_net | **fossen_net_0** | **fossen_net_1** | **fossen_net_2** |
 | :--- | :--- | :--- | :--- |
-| **R² (Overall)** | 0.7735 | **0.9762** | **0.9908** |
-| Thruster 3 R² | 0.2516 | **0.9428** | **0.9781** |
-| Thruster 4 R² | 0.5913 | **0.9528** | **0.9839** |
-| Training Platform | Local | Local | **Amazon Sagemaker** |
-| Data Size | ~20m | ~180m | **~420m** |
+| **R² (Overall)** | 0.7735 | **0.9762** | **0.9908** | **0.9914** |
+| Thruster 3 R² | 0.2516 | **0.9428** | **0.9781** | **0.9802** |
+| Thruster 4 R² | 0.5913 | **0.9528** | **0.9839** | **0.9850** |
+| Training Platform | Local | Local | **Amazon Sagemaker** | Local |
+| Data Size | ~20m | ~180m | **~420m** | **~420m** |
+| Input Size | 24 | 501 | 501 | 34 |
+
+*   **Inputs:**
+    *   **Current State (9 features):** The AUV's current state `[u, v, w, p, q, r, phi, theta, psi]` (velocities and orientations), excluding absolute world position.
+    *   **Reference Trajectory (16 features):** A down-sampled, relative representation of the future path. Instead of the full 492-feature trajectory, the model is given 4 key future waypoints (from timesteps 10, 20, 30, and 40), each with 4 features (`[x, y, z, yaw]`). This provides crucial path information in a much more compact format.
+
+*   **Detailed Architecture:**
+    1.  **State Processing Branch:** A series of fully connected layers (`Linear(9, 64) -> Linear(64, 32)`) with `BatchNorm1d` for stable learning and `LeakyReLU` activation functions.
+    2.  **Trajectory Processing Branch:** The 16 trajectory features are reshaped into a sequence of 4 timesteps (the 4 key waypoints) with 4 features each. A two-layer `LSTM` with a hidden size of 128 processes this sequence. The output from the final timestep is passed through a `Linear(128, 64)` layer.
+    3.  **Combined Branch:** The outputs from the state and trajectory branches are concatenated. This combined feature vector is processed by a deeper series of `Linear` layers (`Linear(96, 256) -> Linear(256, 128) -> Linear(128, 64) -> Linear(64, 8)`) to produce the final 8 thruster commands. `BatchNorm1d` is used here as well.
 
 ## Repository Structure
 
