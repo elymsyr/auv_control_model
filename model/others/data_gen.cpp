@@ -133,16 +133,8 @@ int main(int argc, char** argv) {
             map.resetAll();
             mpc.reset_previous_solution();
 
-            int move_style = rand() % 7;
-
             ref_x = rand_uniform(-30.0f, 30.0f);
             ref_y = rand_uniform(-30.0f, 30.0f);
-            float ref_depth = rand_uniform(5.0f, 20.0f);
-            float desired_yaw = rand_uniform(-M_PI, M_PI);
-            const float turn_rate = 0.1f;
-
-            std::cout << "\n--- Starting Scenario " << scenario + 1 << "/" << MAX_SCENARIOS
-                      << " | Move Style: " << move_style << " ---\n";
 
             int num_obstacles = MIN_OBSTACLES + rand() % (MAX_OBSTACLES - MIN_OBSTACLES);
 
@@ -161,128 +153,60 @@ int main(int argc, char** argv) {
 
             x0 = generate_X_current();
 
+            int target_depth = static_cast<int>(rand_uniform(-1.49f, 20.49f));
+
             for (int step = 0; step < MAX_STEPS; ++step) {
                 double eta1 = static_cast<float>(static_cast<double>(x0(0)));
                 double eta2 = static_cast<float>(static_cast<double>(x0(1)));
+                double eta6 = static_cast<float>(static_cast<double>(x0(5)));
+                
                 map.slide(eta1, eta2);
+                
+                Path path = map.findPath(ref_x, ref_y);
 
-                Path path;
-                path.length = 0;
-                path.points = nullptr;
+                if (rand_uniform(0.0f, 1.0f) < 0.2f) {
+                    target_depth = static_cast<int>(rand_uniform(-1.49f, 20.49f));
+                }
 
-                switch (move_style) {
-                    case 0: // 1- Go to the defined ref point (x,y,z)
-                    {
-                        path = map.findPath(ref_x, ref_y);
-                        for (int k = 0; k <= N; k++) {
-                            float2 position = path.trajectory[k];
-                            x_ref(0, k) = position.x;
-                            x_ref(1, k) = position.y;
-                            // Linearly interpolate depth from current to target
-                            x_ref(2, k) = static_cast<double>(x0(2)) + (ref_depth - static_cast<double>(x0(2))) * (static_cast<float>(k) / N);
-                            x_ref(5, k) = path.angle[k];
-                        }
-                        if (path.points) free(path.points);
-                        break;
-                    }
-                    case 1: // 2- Go to the defined ref point (x, y) (stay at the same z point)
-                    {
-                        path = map.findPath(ref_x, ref_y);
-                        for (int k = 0; k <= N; k++) {
-                            float2 position = path.trajectory[k];
-                            x_ref(0, k) = position.x;
-                            x_ref(1, k) = position.y;
-                            x_ref(2, k) = x0(2); // Keep current depth
-                            x_ref(5, k) = path.angle[k];
-                        }
-                        if (path.points) free(path.points);
-                        break;
-                    }
-                    case 2: // 3- stay still
-                    {
-                        for (int k = 0; k <= N; k++) {
-                            x_ref(0, k) = x0(0); // Hold current X
-                            x_ref(1, k) = x0(1); // Hold current Y
-                            x_ref(2, k) = x0(2); // Hold current Z (depth)
-                            x_ref(5, k) = x0(5); // Hold current Yaw
-                        }
-                        break;
-                    }
-                    case 3: // 4- stay still and turn around itself (mz)
-                    {
-                        for (int k = 0; k <= N; k++) {
-                            x_ref(0, k) = x0(0);
-                            x_ref(1, k) = x0(1);
-                            x_ref(2, k) = x0(2);
-                            // Increment yaw over the horizon
-                            x_ref(5, k) = static_cast<double>(x0(5)) + turn_rate * k;
-                        }
-                        break;
-                    }
-                    case 4: // 5- stay still and turn around to a desired yaw (mz)
-                    {
-                        for (int k = 0; k <= N; k++) {
-                            x_ref(0, k) = x0(0);
-                            x_ref(1, k) = x0(1);
-                            x_ref(2, k) = x0(2);
-                            x_ref(5, k) = desired_yaw; // Set constant desired yaw
-                        }
-                        break;
-                    }
-                    case 5: // 6- keep the position at x and y and change depth (z)
-                    {
-                        for (int k = 0; k <= N; k++) {
-                            x_ref(0, k) = x0(0);
-                            x_ref(1, k) = x0(1);
-                            x_ref(2, k) = ref_depth; // Go to target depth
-                            x_ref(5, k) = x0(5);     // Hold current yaw
-                        }
-                        break;
-                    }
-                    case 6: // 7- keep the position at x and y and change depth (z) with turning itself (mz)
-                    {
-                        for (int k = 0; k <= N; k++) {
-                            x_ref(0, k) = x0(0);
-                            x_ref(1, k) = x0(1);
-                            x_ref(2, k) = ref_depth; // Go to target depth
-                            // Increment yaw over the horizon
-                            x_ref(5, k) = static_cast<double>(x0(5)) + turn_rate * k;
-                        }
-                        break;
-                    }
+                // Use the results directly
+                for (int k = 0; k <= N; k++) {
+                    float2 position = path.trajectory[k];
+                    float yaw = path.angle[k];
+                    
+                    // Use in controller
+                    x_ref(0, k) = position.x;
+                    x_ref(1, k) = position.y;
+                    x_ref(2, k) = target_depth;
+                    x_ref(5, k) = yaw;
                 }
 
                 auto [u_opt, x_opt] = mpc.solve(x0, x_ref);
                 DM x_next = x_opt(Slice(), 1);
                 auto state_error = x_ref(Slice(), 0) - x_opt(Slice(), 1);
 
-                // Store data
-                auto x0_vec = dm_to_vector(x0);
-                auto x_ref_vec = dm_to_vector(x_ref);
-                auto u_opt_vec = dm_to_vector(u_opt(Slice(), 0));
-                auto x_next_vec = dm_to_vector(x_next);
-                
-                x_current_buf.insert(x_current_buf.end(), x0_vec.begin(), x0_vec.end());
-                x_ref_buf.insert(x_ref_buf.end(), x_ref_vec.begin(), x_ref_vec.end());
-                u_opt_buf.insert(u_opt_buf.end(), u_opt_vec.begin(), u_opt_vec.end());
-                x_next_buf.insert(x_next_buf.end(), x_next_vec.begin(), x_next_vec.end());
+                    // Store data
+                    auto x0_vec = dm_to_vector(x0);
+                    auto x_ref_vec = dm_to_vector(x_ref);
+                    auto u_opt_vec = dm_to_vector(u_opt(Slice(), 0));
+                    auto x_next_vec = dm_to_vector(x_next);
+                    
+                    x_current_buf.insert(x_current_buf.end(), x0_vec.begin(), x0_vec.end());
+                    x_ref_buf.insert(x_ref_buf.end(), x_ref_vec.begin(), x_ref_vec.end());
+                    u_opt_buf.insert(u_opt_buf.end(), u_opt_vec.begin(), u_opt_vec.end());
+                    x_next_buf.insert(x_next_buf.end(), x_next_vec.begin(), x_next_vec.end());
 
-                if (x_current_buf.size() >= CHUNK_SIZE * 12) {
-                    write_chunk();
-                }
+                    if (x_current_buf.size() >= CHUNK_SIZE * 12) {
+                        write_chunk();
+                    }
 
                 std::cout << "Step " << step << "\n"
-                        << "  Goal: " << ref_x << ", " << ref_y << "\n"
-                        << "  Controls: " << u_opt << "\n"
-                        << "  State: " << x0 << "\n"
-                        << "  Reference: " << x_ref(Slice(), 0) << "\n";
-
-                if (move_style == 0 || move_style == 1) {
-                    std::cout << "  Path Length: " << path.length << "\n";
-                }
-
-                std::cout << "  Next State: " << x_next << "\n"
-                        << "  State Error: " << state_error << "\n";
+                            << "  Goal: " << ref_x << ", " << ref_y << "\n"
+                            << "  Controls: " << u_opt << "\n"
+                            << "  State: " << x0 << "\n"
+                            << "  Reference: " << x_ref(Slice(), 0) << "\n"
+                            << "  Path Length: " << path.length << "\n"
+                            << "  Next State: " << x_next << "\n"
+                            << "  State Error: " << state_error << "\n";
 
                 x0 = x_next;
 
