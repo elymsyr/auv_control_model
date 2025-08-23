@@ -20,14 +20,14 @@ This project underwent a systematic optimization process that dramatically impro
     4.  **Robust Loss Function:** Switched from `MSELoss` to `HuberLoss` to make training less sensitive to outlier thruster commands.
 *   **Final Result:** The optimized model achieves an overall **R² of 0.9762**, with even the weakest thrusters now performing excellently (e.g., Thruster 3 R² improved from 0.25 to **0.94**).
 
-| Metric | fossen_net | **fossen_net_0** | **fossen_net_1** | **fossen_net_2** |
-| :--- | :--- | :--- | :--- |
-| **R² (Overall)** | 0.7735 | **0.9762** | **0.9908** | **0.9914** |
-| Thruster 3 R² | 0.2516 | **0.9428** | **0.9781** | **0.9802** |
-| Thruster 4 R² | 0.5913 | **0.9528** | **0.9839** | **0.9850** |
-| Training Platform | Local | Local | **Amazon Sagemaker** | Local |
-| Data Size | ~20m | ~180m | **~420m** | **~420m** |
-| Input Size | 24 | 501 | 501 | 34 |
+| Metric            | fossen_net | fossen_net_0 | fossen_net_1 | fossen_net_2 |
+|-------------------|------------|--------------|--------------|--------------|
+| R² (Overall)      | 0.7735     | 0.9762       | 0.9908       | 0.9914       |
+| Thruster 3 R²     | 0.2516     | 0.9428       | 0.9781       | 0.9802       |
+| Thruster 4 R²     | 0.5913     | 0.9528       | 0.9839       | 0.9850       |
+| Training Platform | Local      | Local        | Amazon Sagemaker | Local    |
+| Data Size         | ~20m       | ~180m        | ~420m        | ~420m        |
+| Input Size        | 24         | 501          | 501          | 34           |
 
 *   **Inputs:**
     *   **Current State (9 features):** The AUV's current state `[u, v, w, p, q, r, phi, theta, psi]` (velocities and orientations), excluding absolute world position.
