@@ -160,13 +160,13 @@ int main(int argc, char** argv) {
             }
 
             x0 = generate_X_current();
+            Path path;
 
             for (int step = 0; step < MAX_STEPS; ++step) {
                 double eta1 = static_cast<float>(static_cast<double>(x0(0)));
                 double eta2 = static_cast<float>(static_cast<double>(x0(1)));
                 map.slide(eta1, eta2);
 
-                Path path;
                 path.length = 0;
                 path.points = nullptr;
 
@@ -285,10 +285,6 @@ int main(int argc, char** argv) {
                         << "  State Error: " << state_error << "\n";
 
                 x0 = x_next;
-
-                if (path.points) {
-                    free(path.points);
-                }
             }
             std::cout << "\nCompleted scenario " << scenario + 1 << "/" << MAX_SCENARIOS << "\n";
         }
