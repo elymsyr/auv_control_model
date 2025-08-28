@@ -33,10 +33,10 @@ def export_scalers_to_json(scaler_x_path, scaler_y_path, output_path):
 
 if __name__ == '__main__':
     # Define the paths to your saved scalers
-    SCALER_X_FILE = 'fossen_net_2/scaler_X.gz'
-    SCALER_Y_FILE = 'fossen_net_2/scaler_y.gz'
+    SCALER_X_FILE = 'fossen_net_3/scaler_X.gz'
+    SCALER_Y_FILE = 'fossen_net_3/scaler_y.gz'
     
     # Define the output path for the JSON file
-    OUTPUT_JSON_FILE = 'fossen_net_2/scalers.json'
+    OUTPUT_JSON_FILE = 'fossen_net_3/scalers.json'
     
     export_scalers_to_json(SCALER_X_FILE, SCALER_Y_FILE, OUTPUT_JSON_FILE)
